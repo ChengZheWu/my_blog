@@ -7,3 +7,23 @@ draft: false
 ---
 
 Step 1. 模型準備
+
+建立專案資料結
+
+mkdir ai_api_project cd ai_api_project
+
+使用python內建的虛擬環境，這樣比較不會把環境弄髒
+
+python -m venv venv .\venv\Scripts\activate
+
+安裝所需的套件
+
+bash pip install torch torchvision
+
+訓練或下載一個模型，存成model.pt
+範例：簡單模型訓練
+
+Step 2. FastAPI 架 API
+
+安裝 FastAPI 與 Uvicorn：
+pip install fastapi uvicorn
