@@ -1,9 +1,42 @@
 ---
-title: '測試文章'
+title: 'AI Model → API → 部署'
 date: '2025-07-19'
-tags: ['測試']
-summary: '看看這篇文章會不會出現'
+tags: ['ai_api']
+summary: 'Python coding, API設計, Docker, Cloud部署'
 draft: false
 ---
 
-這是一段測試內容。
+Step 1. 模型準備
+
+建立專案資料結
+
+<pre>
+  <code>```bash mkdir ai_api_project cd ai_api_project ```</code>
+</pre>
+
+使用python內建的虛擬環境，這樣比較不會把環境弄髒
+
+<pre>
+  <code>```bash python -m venv venv .\venv\Scripts\activate ```</code>
+</pre>
+
+安裝所需的套件
+
+<pre>
+  <code>```bash pip install torch torchvision ```</code>
+</pre>
+
+訓練或下載一個模型，存成model.pt
+範例：簡單模型訓練
+
+<pre>
+  <code>
+    ```python import torch import torch.nn as nn model = nn.Sequential( nn.Flatten(),
+    nn.Linear(28*28, 128), nn.ReLU(), nn.Linear(128, 10) ) torch.save(model, "app/model.pt") ```
+  </code>
+</pre>
+
+Step 2. FastAPI 架 API
+
+安裝 FastAPI 與 Uvicorn：
+pip install fastapi uvicorn
