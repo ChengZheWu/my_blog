@@ -1,29 +1,56 @@
 ---
-title: 'AI Model → API → 部署'
+title: '用 FastAPI 打造 AI 模型 API：從 MNIST 到雲端部署'
 date: '2025-07-19'
-tags: ['ai_api']
-summary: 'Python coding, API設計, Docker, Cloud部署'
+tags: ['AI']
+summary: '使用MNIST製作影像辨識API並部屬到雲端'
 draft: false
 ---
 
-Step 1. 模型準備
+在過去學校的作品都只有訓練出AI model，但是不會將它做成API，甚至是部署到雲端，所以藉由這個side project來認識與學習這個流程
 
-建立專案資料結
+這個專案主要會用到Python, Pytorch, FastAPI, Docker, GCP
 
-mkdir ai_api_project cd ai_api_project
+## 模型設計與訓練
 
-使用python內建的虛擬環境，這樣比較不會把環境弄髒
+使用Pytorch訓練MNIST CNN model，最後存成.pt作為API載入用模型
 
-python -m venv venv .\venv\Scripts\activate
+## 利用FastAPI建立API
 
-安裝所需的套件
+### FastAPI簡介
 
-bash pip install torch torchvision
+是一種現代、快速、並且用Python編寫的web框架，建立在Starlette和Pydantic之上
+主要用來建立API應用程式，特別是RESTful API
 
-訓練或下載一個模型，存成model.pt
-範例：簡單模型訓練
+註:
+Starlette: 為非同步web框架，提供底層web處理能力
+Pydantic: 用來進行資料驗證與解析的Python套件，主要功能為定義資料模型、驗證輸入資料格式、自動轉換型別
+RESTful API:是一種遵循 REST（Representational State Transfer）設計風格的 API，常用於web應用程式，用來讓client跟server之間透過HTTP來溝通
 
-Step 2. FastAPI 架 API
+###如何設計/predect路由
+目的是接收一張手寫數字圖片，送進推論model，回傳預測的數字結果
 
-安裝 FastAPI 與 Uvicorn：
-pip install fastapi uvicorn
+app/main.py
+
+```
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from app.predict import predict_digit
+
+app = FastAPI()
+
+class PredictRequest(BaseModel):
+    image_base64: str
+
+@app.post("/predict")
+def predict(req: PredictRequest):
+    try:
+        result = predict_digit(req.image_base64)
+        return {"prediction": result}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+```
+
+@app.post是FastAPI中的路由裝飾器(route decorator)，當有人對/predict路徑發送POST請求時，FastAPI就會呼叫下面的predict()來處理
+/predict是路徑
+request body用Base64傳圖片(簡單、通用)，FastAPI用Pydantic定義資料格式，Base64是一種將二進位跟純文字做轉換的編碼方式
+return為response的格式
