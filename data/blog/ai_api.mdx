@@ -7,7 +7,6 @@ draft: false
 ---
 
 在過去學校的作品都只有訓練出AI model，但是不會將它做成API，甚至是部署到雲端，所以藉由這個side project來認識與學習這個流程
-
 這個專案主要會用到Python, Pytorch, FastAPI, Docker, GCP
 
 ## 模型設計與訓練
@@ -26,9 +25,11 @@ Starlette: 為非同步web框架，提供底層web處理能力
 Pydantic: 用來進行資料驗證與解析的Python套件，主要功能為定義資料模型、驗證輸入資料格式、自動轉換型別
 RESTful API:是一種遵循 REST（Representational State Transfer）設計風格的 API，常用於web應用程式，用來讓client跟server之間透過HTTP來溝通
 
-###如何設計/predect路由
+### 如何設計/predect路由
+
 目的是接收一張手寫數字圖片，送進推論model，回傳預測的數字結果
 
+程式碼分析
 app/main.py
 
 ```
@@ -54,3 +55,15 @@ def predict(req: PredictRequest):
 /predict是路徑
 request body用Base64傳圖片(簡單、通用)，FastAPI用Pydantic定義資料格式，Base64是一種將二進位跟純文字做轉換的編碼方式
 return為response的格式
+
+接著透過FastAPI會自動生成Swagger UI，可以輸入下列網址，然後打開
+http://127.0.0.1:8000/docs
+Swagger UI 是一個自動產生的、可互動的 API 測試網頁介面，幫你快速測試、展示和文件化你的 API
+主要功能有:
+自動列出所有 API 路由，不用手寫，FastAPI 自動抓你寫的所有 @app.get()、@app.post()
+顯示每個路由的輸入格式與輸出格式，根據 Pydantic model 自動產生說明
+可直接輸入資料進行測試，不用寫 Postman、curl，直接在網頁測
+回傳內容與格式直接顯示，輸出 JSON
+可支援 token / header 驗證測試，有登入驗證機制也能測
+
+## Docker打包
