@@ -1,35 +1,32 @@
 ---
-title: '用 FastAPI 打造 AI 模型 API：從 MNIST 到雲端部署'
+title: 'Deploying an MNIST AI API with FastAPI'
 date: '2025-07-19'
 tags: ['AI']
-summary: '使用MNIST製作影像辨識API並部屬到雲端'
+summary: 'Build an image recognition API using MNIST and deploy it to the cloud'
 draft: false
 ---
-
-在過去學校的作品都只有訓練出AI model，但是不會將它做成API，甚至是部署到雲端，所以藉由這個side project來認識與學習這個流程
-這個專案主要會用到Python, Pytorch, FastAPI, Docker, GCP
 
 ## 模型設計與訓練
 
 使用Pytorch訓練MNIST CNN model，最後存成.pt作為API載入用模型
 
-## 利用FastAPI建立API
+## Step 1: 利用FastAPI建立API
 
 ### FastAPI簡介
 
-是一種現代、快速、並且用Python編寫的web框架，建立在Starlette和Pydantic之上
+是一種現代、快速、並且用Python編寫的web框架，建立在Starlette和Pydantic之上  
 主要用來建立API應用程式，特別是RESTful API
 
-註:
-Starlette: 為非同步web框架，提供底層web處理能力
-Pydantic: 用來進行資料驗證與解析的Python套件，主要功能為定義資料模型、驗證輸入資料格式、自動轉換型別
+註:  
+Starlette: 為非同步web框架，提供底層web處理能力  
+Pydantic: 用來進行資料驗證與解析的Python套件，主要功能為定義資料模型、驗證輸入資料格式、自動轉換型別  
 RESTful API:是一種遵循 REST（Representational State Transfer）設計風格的 API，常用於web應用程式，用來讓client跟server之間透過HTTP來溝通
 
 ### 如何設計/predect路由
 
 目的是接收一張手寫數字圖片，送進推論model，回傳預測的數字結果
 
-程式碼分析
+程式碼分析  
 app/main.py
 
 ```
@@ -51,19 +48,156 @@ def predict(req: PredictRequest):
         raise HTTPException(status_code=400, detail=str(e))
 ```
 
-@app.post是FastAPI中的路由裝飾器(route decorator)，當有人對/predict路徑發送POST請求時，FastAPI就會呼叫下面的predict()來處理
-/predict是路徑
-request body用Base64傳圖片(簡單、通用)，FastAPI用Pydantic定義資料格式，Base64是一種將二進位跟純文字做轉換的編碼方式
+@app.post是FastAPI中的路由裝飾器(route decorator)，當有人對/predict路徑發送POST請求時，FastAPI就會呼叫下面的predict()來處理  
+/predict是路徑  
+request body用Base64傳圖片(簡單、通用)，FastAPI用Pydantic定義資料格式，Base64是一種將二進位跟純文字做轉換的編碼方式  
 return為response的格式
 
-接著透過FastAPI會自動生成Swagger UI，可以輸入下列網址，然後打開
-http://127.0.0.1:8000/docs
-Swagger UI 是一個自動產生的、可互動的 API 測試網頁介面，幫你快速測試、展示和文件化你的 API
-主要功能有:
-自動列出所有 API 路由，不用手寫，FastAPI 自動抓你寫的所有 @app.get()、@app.post()
-顯示每個路由的輸入格式與輸出格式，根據 Pydantic model 自動產生說明
-可直接輸入資料進行測試，不用寫 Postman、curl，直接在網頁測
-回傳內容與格式直接顯示，輸出 JSON
+接著透過FastAPI會自動生成Swagger UI，可以輸入下列網址，然後打開  
+http://127.0.0.1:8000/docs  
+Swagger UI 是一個自動產生的、可互動的 API 測試網頁介面，幫你快速測試、展示和文件化你的 API  
+主要功能有:  
+自動列出所有 API 路由，不用手寫，FastAPI 自動抓你寫的所有 @app.get()、@app.post()  
+顯示每個路由的輸入格式與輸出格式，根據 Pydantic model 自動產生說明  
+可直接輸入資料進行測試，不用寫 Postman、curl，直接在網頁測  
+回傳內容與格式直接顯示，輸出 JSON  
 可支援 token / header 驗證測試，有登入驗證機制也能測
 
-## Docker打包
+## Step 2: Build a Docker image
+
+#### Brief Introduction of Docker
+
+Docker is an open-source containerization platform that packages all the libraries, configurations, and resources of an application into a container. This ensures the container can run consistently across different environments.  
+In this implementation, we use Docker Desktop, a graphical toolkit that integrates the Docker Engine, a container management GUI, the Docker CLI, and automatic WSL2 installation. It's ideal for beginners who want to get started quickly, especially those using Windows or macOS and prefer a graphical interface.
+
+#### Install Docker Desktop
+
+Official Website: https://www.docker.com/products/docker-desktop/
+
+#### Create a Dockerfile
+
+Dockerfile is used to define and create a Docker image
+
+```
+# 1. choose a base image
+FROM python:3.10-slim
+
+# 2. Set the working directory inside the container
+WORKDIR /app
+
+# 3. Copy the local files to the container, such as code or requirements.txt
+COPY ./app ./app
+COPY ./model ./model
+COPY requirements.txt ./
+
+# 4. Excute a command (Usually used to install packages)
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 5. declare the port that container uses（just explanation）
+EXPOSE 8080
+
+# 6. The command to run when the container starts. Only one CMD in a Dockerfile
+#    Run app from main.py using Uvicorn, with the host set to 0.0.0.0 and the port set to 8080, making it accessible from outside.
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
+
+```
+
+There are 4 layers in a Dockerfile.
+1.Base image: Something like python:3.10-slim or ubuntu:22.04, which already comes with the operating system and environment prepared for you.  
+2.Dependency layer: The packages you install using commands like RUN pip install ....  
+3.Application layer: Your source code and configuration.  
+4.Top layer: The settings executed when the container starts (e.g., CMD).
+
+#### Create a .dockignore
+
+Ignore the things we don't want to pack.
+
+```
+__pycache__/
+venv/
+```
+
+There is a problem with this file, so it doesn't work. I don't know how to fix it. And then, I just delete venv before building Docker image.
+
+#### Create a Docker image and test
+
+```
+# Build build: the command to create a Docker image
+# -t ai-api is the name of image
+# . is the current working path
+docker build -t ai-api .
+
+# Use the previously built image ai-api to start a new container and set up port mapping.
+# docker run: the command to run a new container
+# -p 8000:8080 is Port mapping: the left port is on the host machine and the right port is inside the container
+# ai-api is The name of the image to run
+docker run -p 8000:8080 ai-api
+```
+
+When you visit http://localhost:8000 (the left port) in your host browser, the request will be routed to the application running inside the container.  
+For test, visit http://localhost:8000/docs.  
+Here is the base64 string "iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA6ElEQVR4nGNgGMyAWUhIqK5jvdSy/9/rQXwWmIQcm5WNQDCI9WRS4OeLB0EsRqic4V5+KOtf0leGZ+9vIpsodPsvCBzb9v0jFvsC5mT//XuWm0F7FjbX8DHO+huFKsQEZ336/5EhBcFFB9z7/rrh9qfyx4cLcmDuxwCBH/7+LZfEJau76+/fadK4ZAVi//zdjdvin39/OkCZLKgyeiGmLAzXDmHTpD7l6d+/f39twyIlUXQXFLwn/TClxJ2ugkM+EDOQhFaDY+VwACeGlPmaRyCpL63cqOJg1wYGMjBc3/y35wNuD1ITAABFF16AbmkxawAAAABJRU5ErkJggg=="  
+The answer is 5.
+
+## Step 3: Deploy to the Cloud
+
+Deploy the MNIST AI API project to Google Cloud Platform (GCP)
+
+#### Prerequisite
+
+Install gcloud CLI (Google Cloud SDK): https://cloud.google.com/sdk/docs/install
+
+```
+# login google account
+gcloud auth login
+
+# Initialization GCP project and area
+gcloud init
+
+# Set specific project and area
+gcloud config set project mnist-api-469005
+gcloud config set run/region asia-east1
+
+# Enable Cloud Run and Artifact Registry API
+gcloud services enable run.googleapis.com artifactregistry.googleapis.com
+```
+
+Verify that login and project setup were successful (Optional)
+
+```
+# check the current account
+gcloud auth list
+
+# check the current project
+gcloud config list project
+```
+
+#### Start to deploy
+
+The project information:  
+The Dockerfile is located in the project root directory  
+GCP Project ID：mnist-api-466814  
+Region：asia-east1  
+Artifact Repo name：mnist-repo  
+Image name：mnist-api
+
+```
+# Create Artifact Registry (A repository for storing Docker images)
+# We only create it once, and we can push new version of image without excuting this cmd again.
+gcloud artifacts repositories create mnist-repo --repository-format=docker --location=asia-east1 --project=mnist-api-469005 --description="MNIST API Repo"
+
+# Login Docker with GCP
+# Configure Docker credentials to authorize image uploads to GCP's Artifact Registry.
+gcloud auth configure-docker asia-east1-docker.pkg.dev
+
+# Build a Docker image and tag it in a format compatible with Cloud Run.
+docker build -t asia-east1-docker.pkg.dev/mnist-api-469005/mnist-repo/mnist-api .
+
+# Push Docker image to Arifact Registry
+docker push asia-east1-docker.pkg.dev/mnist-api-469005/mnist-repo/mnist-api
+
+# Deploy Docker image to Cloud Run
+gcloud run deploy mnist-api --image=asia-east1-docker.pkg.dev/mnist-api-469005/mnist-repo/mnist-api --platform=managed --region=asia-east1 --allow-unauthenticated --project=mnist-api-469005 --memory=1Gi
+```
+
+Finally, we can get a URL to access MNIST AI API.
