@@ -2,32 +2,50 @@
 title: 'Deploying an MNIST AI API with FastAPI'
 date: '2025-07-19'
 tags: ['AI']
-summary: 'Build an image recognition API using MNIST and deploy it to the cloud'
+summary: 'Build an AI image recognition API with MNIST and deploy it to the cloud'
 draft: false
 ---
 
-## 模型設計與訓練
+In the past, I had some experience about AI project, including image recognition and NLP, but all of them were only code.  
+Through this project, I learned how to make my work be like a real product.  
+First, use a simple AI image task (image recognition with MNIST) and build a API with fastAPI.  
+Second, adapt Docker to pack the API.
+At last, Deploy the whole project to the Cloud. Here, I chose Google Cloud Platform (GCP).  
+After finishing this project, everyone can access this API by an URL.
 
-使用Pytorch訓練MNIST CNN model，最後存成.pt作為API載入用模型
+## Step 1: Model Training and Build an API with FastAPI
 
-## Step 1: 利用FastAPI建立API
+Train an MNIST CNN model using PyTorch, and save it as a .pt file for loading into an API.
 
-### FastAPI簡介
+```
+cd mnist_api
+# Use python virtual environment to make sure that the local environment would be clean.
+python -m venv venv
+.\venv\Scripts\activate
+pip install -r requirements.txt
 
-是一種現代、快速、並且用Python編寫的web框架，建立在Starlette和Pydantic之上  
-主要用來建立API應用程式，特別是RESTful API
+# Train model
+python -m train.train_model
 
-註:  
-Starlette: 為非同步web框架，提供底層web處理能力  
-Pydantic: 用來進行資料驗證與解析的Python套件，主要功能為定義資料模型、驗證輸入資料格式、自動轉換型別  
-RESTful API:是一種遵循 REST（Representational State Transfer）設計風格的 API，常用於web應用程式，用來讓client跟server之間透過HTTP來溝通
+# Run FastAPI
+# we can access this URL: http://127.0.0.1:8000/docs and use SwaggerUI to test the API (Refer to the Docker part).
+# Used to start Uvicorn, a Python ASGI server, to run the FastAPI application.
+uvicorn app.main:app --reload
+```
 
-### 如何設計/predect路由
+#### FastAPI Introduction
 
-目的是接收一張手寫數字圖片，送進推論model，回傳預測的數字結果
+FastAPI is a modern, high-performance web framework written in Python. It is built on top of Starlette and Pydantic, and is primarily used to build API applications—especially RESTful APIs.
 
-程式碼分析  
-app/main.py
+Starlette: An asynchronous web framework that provides the underlying web handling capabilities.  
+Pydantic: A Python library for data validation and parsing. It is mainly used to define data models, validate input formats, and perform automatic type conversion.  
+RESTful API: An API that follows the REST (Representational State Transfer) architectural style. It is commonly used in web applications to enable communication between clients and servers over HTTP.
+
+#### Design the /predect Route
+
+The purpose is to receive a handwritten picture with a base64 format, and then use our model to predict the result.
+
+Analysis app/main.py
 
 ```
 from fastapi import FastAPI, HTTPException
@@ -48,20 +66,15 @@ def predict(req: PredictRequest):
         raise HTTPException(status_code=400, detail=str(e))
 ```
 
-@app.post是FastAPI中的路由裝飾器(route decorator)，當有人對/predict路徑發送POST請求時，FastAPI就會呼叫下面的predict()來處理  
-/predict是路徑  
-request body用Base64傳圖片(簡單、通用)，FastAPI用Pydantic定義資料格式，Base64是一種將二進位跟純文字做轉換的編碼方式  
-return為response的格式
+@app.post is a route decorator in FastAPI. When a POST request is sent to the /predict path, FastAPI will call the predict() function defined below to handle the request  
+/predict is the route path.
+The request body contains an image encoded in Base64 format, which is simple and widely supported.  
+FastAPI uses Pydantic to define the data schema for the request body.  
+Base64 is an encoding method that converts binary data into plain text.  
+The function returns a response in a specified format.
 
-接著透過FastAPI會自動生成Swagger UI，可以輸入下列網址，然後打開  
-http://127.0.0.1:8000/docs  
-Swagger UI 是一個自動產生的、可互動的 API 測試網頁介面，幫你快速測試、展示和文件化你的 API  
-主要功能有:  
-自動列出所有 API 路由，不用手寫，FastAPI 自動抓你寫的所有 @app.get()、@app.post()  
-顯示每個路由的輸入格式與輸出格式，根據 Pydantic model 自動產生說明  
-可直接輸入資料進行測試，不用寫 Postman、curl，直接在網頁測  
-回傳內容與格式直接顯示，輸出 JSON  
-可支援 token / header 驗證測試，有登入驗證機制也能測
+FastAPI automatically generates a Swagger UI for your API.  
+You can access it by opening the following URL in your browser: http://127.0.0.1:8000/docs
 
 ## Step 2: Build a Docker image
 
