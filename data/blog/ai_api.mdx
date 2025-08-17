@@ -1,16 +1,16 @@
 ---
-title: 'Deploying an MNIST AI API with FastAPI'
-date: '2025-07-19'
+title: 'Image Recognition AI API with Docker and Cloud Deployment'
+date: '2025-08-15'
 tags: ['AI']
-summary: 'Build an AI image recognition API with MNIST and deploy it to the cloud'
+summary: 'Build an image recognition AI model API, package it with Docker, and deploy it to the cloud.'
 draft: false
 ---
 
-In the past, I had some experience about AI project, including image recognition and NLP, but all of them were only code.  
+In the past, I had some experience about AI project, including image recognition and NLP, but all of them were just code.  
 Through this project, I learned how to make my work be like a real product.  
-First, use a simple AI image task (image recognition with MNIST) and build a API with fastAPI.  
+First, use a simple AI image task (image recognition with MNIST) and build a API with fastAPI.
 Second, adapt Docker to pack the API.
-At last, Deploy the whole project to the Cloud. Here, I chose Google Cloud Platform (GCP).  
+At last, Deploy the whole project to the Cloud. Here, I chose Google Cloud Platform (GCP).
 After finishing this project, everyone can access this API by an URL.
 
 ## Step 1: Model Training and Build an API with FastAPI
@@ -73,8 +73,8 @@ FastAPI uses Pydantic to define the data schema for the request body.
 Base64 is an encoding method that converts binary data into plain text.  
 The function returns a response in a specified format.
 
-FastAPI automatically generates a Swagger UI for your API.  
-You can access it by opening the following URL in your browser: http://127.0.0.1:8000/docs
+FastAPI automatically generates a Swagger UI for the API.  
+We can access it by opening the following URL in the browser: http://127.0.0.1:8000/docs
 
 ## Step 2: Build a Docker image
 
@@ -154,7 +154,7 @@ The answer is 5.
 
 ## Step 3: Deploy to the Cloud
 
-Deploy the MNIST AI API project to Google Cloud Platform (GCP)
+Deploy the MNIST AI API project to GCP
 
 #### Prerequisite
 
@@ -214,3 +214,11 @@ gcloud run deploy mnist-api --image=asia-east1-docker.pkg.dev/mnist-api-469005/m
 ```
 
 Finally, we can get a URL to access MNIST AI API.
+We can use this cmd to test our API in Windows terminal.
+
+```
+# The answer is 5.
+curl -X POST https://mnist-api-qg5knr5g6a-de.a.run.app/predict ^
+  -H "Content-Type: application/json" ^
+  -d "{\"image_base64\": \"iVBORw0KGgoAAAANSUhEUgAAABwAAAAcCAAAAABXZoBIAAAA6ElEQVR4nGNgGMyAWUhIqK5jvdSy/9/rQXwWmIQcm5WNQDCI9WRS4OeLB0EsRqic4V5+KOtf0leGZ+9vIpsodPsvCBzb9v0jFvsC5mT//XuWm0F7FjbX8DHO+huFKsQEZ336/5EhBcFFB9z7/rrh9qfyx4cLcmDuxwCBH/7+LZfEJau76+/fadK4ZAVi//zdjdvin39/OkCZLKgyeiGmLAzXDmHTpD7l6d+/f39twyIlUXQXFLwn/TClxJ2ugkM+EDOQhFaDY+VwACeGlPmaRyCpL63cqOJg1wYGMjBc3/y35wNuD1ITAABFF16AbmkxawAAAABJRU5ErkJggg==\"}"
+```
