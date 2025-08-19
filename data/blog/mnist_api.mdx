@@ -6,7 +6,7 @@ summary: 'Build an image classification AI model API, package it with Docker, an
 draft: false
 ---
 
-## 1. The Story Behind the Project
+## The Story Behind the Project
 
 In the past, I had some experience about AI project, including image recognition and NLP, but all of them were just code.  
 Through this project, I would like to learn how to make my work be like a real product.
@@ -17,7 +17,7 @@ This project was designed to:
 
 ---
 
-## 2. Tech Stack
+## Tech Stack
 
 This project uses the following technologies:
 
@@ -29,7 +29,7 @@ This project uses the following technologies:
 
 ---
 
-## 3. Step-by-Step Implementation with explaination
+## Step-by-Step Implementation with explaination
 
 ### Getting Started
 
@@ -63,7 +63,7 @@ uvicorn app.main:app --reload
 ```
 
 Open the Swagger UI for interactive testing:  
-👉 http://127.0.0.1:8000/docs
+http://127.0.0.1:8000/docs
 
 <img src="/static/images/SwaggerUI.png" alt="Swagger UI" width="800" height="600" />
 
@@ -220,7 +220,7 @@ Once deployed, you’ll get a public endpoint like:
 https://mnist-api-xxxxx.a.run.app/predict
 ```
 
-### Test
+### 5. Test
 
 #### Method 1
 
@@ -244,30 +244,30 @@ The answer is 5.
 
 ---
 
-## 4. Gotchas & Debugging
+## Gotchas & Debugging
 
 Here are some real issues I encountered:
 
-- ❌ **.dockerignore doesn't work** — I already add `venv/` in .dockerignore, but it didn't work. And then I delete the venv file directly.
-- ❌ **Out-of-memory error** — default 512 MiB was too small for this cmd (gcloud run deploy); increased to 1GiB
-- ❌ **Incorrect base64 input** — not using proper grayscale-encoded MNIST images
+- **.dockerignore doesn't work** — I already add `venv/` in .dockerignore, but it didn't work. And then I delete the venv file directly.
+- **Out-of-memory error** — default 512 MiB was too small for this cmd (gcloud run deploy); increased to 1GiB
+- **Incorrect base64 input** — not using proper grayscale-encoded MNIST images
 
 Each of these taught me something about deployment pipelines!
 
 ---
 
-## 5. Future Improvements & Extensions
+## Future Improvements & Extensions
 
 This was just a start. Possible extensions:
 
-- 📦 Add support for image file uploads (not just base64)
-- 🧠 Swap in more advanced models (ResNet, YOLO, etc.)
-- 🔁 Add CI/CD using GitHub Actions to auto-deploy on push
-- 🌍 Add frontend for real-time predictions (React/Streamlit)
+- Add support for image file uploads (not just base64)
+- Swap in more advanced models (ResNet, YOLO, etc.)
+- Add CI/CD using GitHub Actions to auto-deploy on push
+- Add frontend for real-time predictions (React/Streamlit)
 
 ---
 
-## 6. Conclusion
+## Conclusion
 
 This side project helped me:
 
@@ -277,7 +277,7 @@ This side project helped me:
 
 ### GitHub Repository
 
-[👉 View on GitHub](https://github.com/ChengZheWu/Image-Classification-AI-API-with-Docker-and-Cloud-Deployment)
+[View on GitHub](https://github.com/ChengZheWu/Image-Classification-AI-API-with-Docker-and-Cloud-Deployment)
 
 ---
 
