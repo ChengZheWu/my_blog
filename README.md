@@ -131,7 +131,9 @@ Blog
 - Custom 404 page (`pages/404.js`)
 - RSS feed, sitemap, and SEO config in `next-seo.config.js`
 - Author pages (`data/authors/`)
-  Vercel
+
+Vercel
+
 - Add Environment Variables
 - Add Custom Domain
 
