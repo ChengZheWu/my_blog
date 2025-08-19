@@ -32,7 +32,7 @@ Visit `http://localhost:3000` in your browser to view the blog locally.
 
 You can personalize your blog in the following ways:
 
-### ✏️ Edit Site Metadata
+### Edit Site Metadata
 
 Update the file:
 
@@ -119,12 +119,7 @@ Click **Deploy**.
 ### 5. Deployment Complete
 
 - Vercel will build and deploy the site
-- A public URL will be created like:
-
-```
-https://my-blog-yourname.vercel.app
-```
-
+- A public URL will be created like: https://myblog-alpha-umber.vercel.app/ (This is my blog)
 - Future commits to GitHub will **auto-redeploy**
 
 ---
