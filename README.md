@@ -139,8 +139,6 @@ Vercel
 
 ## Optional Integrations
 
-You can integrate with:
-
 - Google Analytics (via environment variable `NEXT_PUBLIC_GOOGLE_ANALYTICS`)
 - Plausible, Umami, or other providers
 - Comment systems like Giscus or Disqus
