@@ -122,8 +122,6 @@ Click **Deploy**.
 - A public URL will be created like: https://myblog-alpha-umber.vercel.app/ (This is my blog)
 - Future commits to GitHub will **auto-redeploy**
 
----
-
 ## Advanced Features
 
 Blog
