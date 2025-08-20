@@ -143,6 +143,12 @@ Vercel
 - Plausible, Umami, or other providers
 - Comment systems like Giscus or Disqus
 
+## Notes
+
+This project was built as a side project to practice software development and document my learning journey.  
+Some parts of the code were assisted by AI tools (e.g., ChatGPT) to help with coding, debugging, and optimization.  
+All code has been reviewed and adapted to fit the goals of this project.
+
 ## 📄 License
 
 [MIT](https://github.com/timlrx/tailwind-nextjs-starter-blog/blob/main/LICENSE) © [Andy Wu](https://myblog-alpha-umber.vercel.app/)
